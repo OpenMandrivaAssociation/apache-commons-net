@@ -11,7 +11,7 @@ Group:          Development/Java
 URL:            http://commons.apache.org/%{base_name}/
 Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 BuildArch:      noarch
-BuildRequires:  jpackage-utils >= 0:1.7.2
+BuildRequires:  jpackage-utils >= 0:1.7.5
 BuildRequires:  java-devel >= 0:1.6.0
 BuildRequires:  maven-doxia-sitetools
 BuildRequires:  maven-changes-plugin
@@ -21,9 +21,9 @@ BuildRequires:  maven-plugin-build-helper
 BuildRequires:  apache-commons-parent
 
 Requires:       java >= 0:1.6.0
-Requires:       jpackage-utils >= 0:1.7.2
-Requires(post):    jpackage-utils
-Requires(postun):  jpackage-utils
+Requires:       jpackage-utils >= 0:1.7.5
+Requires(post):    jpackage-utils >= 0:1.7.5
+Requires(postun):  jpackage-utils >= 0:1.7.5
 
 
 Provides:       jakarta-%{short_name} = 0:%{version}-%{release}
@@ -39,7 +39,7 @@ fundamental protocol access, not higher-level abstractions.
 %package javadoc
 Summary:    API documentation for %{name}
 Group:      Development/Java
-Requires:   jpackage-utils
+Requires:   jpackage-utils >= 0:1.7.5
 
 Obsoletes:  jakarta-%{short_name}-javadoc < 0:2.0-3
 
