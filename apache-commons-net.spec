@@ -62,14 +62,14 @@ mvn-jpp -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
 
 %install
 # jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -p -m 644 target/%{short_name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
-ln -s %{name}.jar $RPM_BUILD_ROOT%{_javadir}/%{short_name}.jar
+install -d -m 755 %{buildroot}%{_javadir}
+install -p -m 644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+ln -s %{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
 
 
 # pom
-install -d -m 755 $RPM_BUILD_ROOT%{_mavenpomdir}
-install -pm 644 pom.xml $RPM_BUILD_ROOT%{_mavenpomdir}/JPP-%{name}.pom
+install -d -m 755 %{buildroot}%{_mavenpomdir}
+install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 %add_to_maven_depmap org.apache.commons %{short_name} %{version} JPP %{name}
 
 # following line is only for backwards compatibility. New packages
@@ -77,8 +77,8 @@ install -pm 644 pom.xml $RPM_BUILD_ROOT%{_mavenpomdir}/JPP-%{name}.pom
 %add_to_maven_depmap %{short_name} %{short_name} %{version} JPP %{name}
 
 # javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
+cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 
 
 %post
