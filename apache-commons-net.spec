@@ -3,8 +3,8 @@
 %global short_name   commons-%{base_name}
 
 Name:           apache-%{short_name}
-Version:        2.2
-Release:        5
+Version:        3.1
+Release:        1
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
 Group:          Development/Java
