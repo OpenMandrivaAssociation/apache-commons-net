@@ -4,7 +4,7 @@
 
 Name:           apache-%{short_name}
 Version:        3.1
-Release:        3
+Release:        4
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
 Group:          Development/Java
