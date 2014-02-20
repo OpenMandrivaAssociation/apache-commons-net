@@ -1,33 +1,25 @@
-
+%{?_javapackages_macros:%_javapackages_macros}
 %global base_name    net
 %global short_name   commons-%{base_name}
 
 Name:           apache-%{short_name}
-Version:        3.1
-Release:        3
+Version:        3.3
+Release:        2.1%{?dist}
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
-Group:          Development/Java
 URL:            http://commons.apache.org/%{base_name}/
-Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 BuildArch:      noarch
-BuildRequires:  jpackage-utils >= 0:1.7.2
-BuildRequires:  java-devel >= 0:1.6.0
-BuildRequires:  maven-doxia-sitetools
-BuildRequires:  maven-changes-plugin
-BuildRequires:  maven-surefire-provider-junit
-BuildRequires:  maven-surefire-provider-junit4
+
+BuildRequires:  maven-local
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  apache-commons-parent
-
-Requires:       java >= 0:1.6.0
-Requires:       jpackage-utils >= 0:1.7.2
-Requires(post):    jpackage-utils
-Requires(postun):  jpackage-utils
-
+# Test dependency
+BuildRequires:  junit
 
 Provides:       jakarta-%{short_name} = 0:%{version}-%{release}
 Obsoletes:      jakarta-%{short_name} < 0:2.0-3
+
 
 %description
 This is an Internet protocol suite Java library originally developed by
@@ -38,9 +30,7 @@ fundamental protocol access, not higher-level abstractions.
 
 %package javadoc
 Summary:    API documentation for %{name}
-Group:      Development/Java
-Requires:   jpackage-utils
-
+Provides:   jakarta-%{short_name}-javadoc = 0:%{version}-%{release}
 Obsoletes:  jakarta-%{short_name}-javadoc < 0:2.0-3
 
 %description javadoc
@@ -48,59 +38,92 @@ Obsoletes:  jakarta-%{short_name}-javadoc < 0:2.0-3
 
 %prep
 %setup -q -n %{short_name}-%{version}-src
-sed -i 's/\r//' NOTICE.txt LICENSE.txt
+sed -i 's/\r//' NOTICE.txt LICENSE.txt README RELEASE-NOTES.txt
 
+# This test fails with "Connection timed out"
+rm src/test/java/org/apache/commons/net/time/TimeTCPClientTest.java
+
+%mvn_file  : %{short_name} %{name}
+%mvn_alias : org.apache.commons:%{short_name}
 
 %build
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mkdir -p $MAVEN_REPO_LOCAL
-# test.failure.ignore added because package would not build on koji
-# with TimeTCPClientTest failing
-mvn-jpp -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-    -Dmaven.test.failure.ignore=true \
-    install javadoc:javadoc
+%mvn_build
 
 %install
-# jars
-install -d -m 755 %{buildroot}%{_javadir}
-install -p -m 644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
-ln -s %{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
+%mvn_install
 
 
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-%add_to_maven_depmap org.apache.commons %{short_name} %{version} JPP %{name}
+%files -f .mfiles
+%doc LICENSE.txt NOTICE.txt README RELEASE-NOTES.txt
 
-# following line is only for backwards compatibility. New packages
-# should use proper groupid org.apache.commons and also artifactid
-%add_to_maven_depmap %{short_name} %{short_name} %{version} JPP %{name}
-
-# javadoc
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
-
-
-%post
-%update_maven_depmap
-
-%postun
-%update_maven_depmap
-
-%pre javadoc
-# workaround for rpm bug, can be removed in F-17
-[ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
-rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
-
-%files
-%defattr(-,root,root,-)
+%files javadoc -f .mfiles-javadoc
 %doc LICENSE.txt NOTICE.txt
-%{_javadir}/*
-%{_mavenpomdir}/JPP-%{name}.pom
-%{_mavendepmapfragdir}
 
-%files javadoc
-%defattr(-,root,root,-)
-%doc %{_javadocdir}/%{name}
-%doc LICENSE.txt NOTICE.txt
+%changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Wed Jun 12 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 3.3-1
+- Update to upstream version 3.3
+
+* Wed Jun 05 2013 Michal Srb <msrb@redhat.com> - 3.2-5
+- Enable tests
+- Install README, RELEASE-NOTES.txt files
+- Fix BR
+
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 3.2-3
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
+
+* Wed Jan 16 2013 Michal Srb <msrb@redhat.com> - 3.2-2
+- Build with xmvn
+
+* Mon Dec  3 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 3.2-1
+- Update to upstream version 3.2
+
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Tue Jun 19 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 3.1-1
+- Update to upstream 3.1
+- Remove RPM bug workaround
+- Remove BR on maven-changes-plugin
+
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Thu Nov 24 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.2-3
+- Use maven 3 to build
+- Packaging fixes according to latest guidelines
+
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Fri Dec 10 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.2-1
+- Replace maven plugins with apache-commons-parent for BR
+- Versionless jars and javadocs
+- Rebase to latest upstream version
+
+* Thu Jul  8 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0-6
+- Add license to javadoc subpackage
+
+* Thu May 20 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0-5
+- Fix maven depmap JPP name to short_name
+
+* Wed May 19 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0-4
+- Ignore test failure
+
+* Wed May 12 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0-3
+- Rename jakarta-commons-net to apache-commons-net and drop EPOCH
+- Build with maven
+- Clean up whole spec
+
+* Thu Aug 13 2009 Alexander Kurtakov <akurtako@redhat.com> 0:2.0-2
+- Set maven.repo.local.
+
+* Thu Aug 13 2009 Alexander Kurtakov <akurtako@redhat.com> 0:2.0-1
+- Update to upstream 2.0.
 
