@@ -4,7 +4,7 @@
 
 Name:           apache-%{short_name}
 Version:        3.3
-Release:        2.1%{?dist}
+Release:        3
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
 URL:            http://commons.apache.org/%{base_name}/
@@ -42,6 +42,7 @@ sed -i 's/\r//' NOTICE.txt LICENSE.txt README RELEASE-NOTES.txt
 
 # This test fails with "Connection timed out"
 rm src/test/java/org/apache/commons/net/time/TimeTCPClientTest.java
+rm src/test/java/org/apache/commons/net/ftp/TestConnectTimeout.java
 
 %mvn_file  : %{short_name} %{name}
 %mvn_alias : org.apache.commons:%{short_name}
