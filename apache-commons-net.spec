@@ -4,7 +4,7 @@
 
 Name:           apache-%{short_name}
 Version:        3.3
-Release:        4
+Release:        5
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
 URL:            http://commons.apache.org/%{base_name}/
