@@ -7,7 +7,7 @@ Version:        3.3
 Release:        6
 Summary:        Internet protocol suite Java library
 License:        ASL 2.0
-URL:            http://commons.apache.org/%{base_name}/
+URL:            https://commons.apache.org/%{base_name}/
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 BuildArch:      noarch
 
